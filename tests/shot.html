@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Пантеон — снимок</title>
+<style>html,body{margin:0;height:100%;background:#000}iframe{width:100%;height:100%;border:0}</style>
+<!-- Для снимков headless Chrome: ?tab=hero|omens|world|pantheon&years=N&race=..&world=..&sph=N -->
+<iframe id="f"></iframe>
+<script>
+const q = new URLSearchParams(location.search), slot = 'shot' + Math.random().toString(36).slice(2, 6);
+const f = document.getElementById('f');
+f.src = '../index.html?slot=' + slot;
+f.onload = () => {
+  const w = f.contentWindow;
+  w.eval(`godScreen(); UI.god.name=${JSON.stringify(q.get('god') || 'Мойра')}; UI.god.g='f'; UI.god.sph=${+q.get('sph') || 0}; UI.god.speed='tz'; createGod();
+    UI.creating={g:'${q.get('g') || 'm'}',race:'${q.get('race') || 'elf'}',world:'${q.get('world') || 'human'}',dest:'${q.get('dest') || 'sage'}',name:''}; birthHero();
+    E.seed(${+q.get('seed') || 11});
+    S.paused=true; E.advance(S, 24*365*${+q.get('years') || 6}, false); const h=S.heroes[0]; if(!h.ev) E.startEvent(h,S); S.god.faith=42;
+    if('${q.get('omen') || ''}'){ E.omen(S,h.id,S.god.sph,'help',D.SPHERES[S.god.sph].help[0].id); }
+    setTab('${q.get('tab') || 'hero'}'); closeModal(); document.querySelectorAll('.toast').forEach(t=>t.remove()); render(true);`);
+};
+</script>

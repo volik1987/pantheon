@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><title>Пантеон — тест сети</title>
+<style>body{margin:0;display:flex;height:100vh;background:#000}iframe{flex:1;border:0;border-right:2px solid #444}</style>
+<!-- Два бога в одном браузере: транспорт BroadcastChannel (?local=1), разные сохранения (?slot=). -->
+<iframe id="a" src="../index.html?local=1&slot=testA"></iframe>
+<iframe id="b" src="../index.html?local=1&slot=testB"></iframe>
+<script>
+const W = id => document.getElementById(id).contentWindow;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function setup(w, slot, name, sph, g) {
+  w.localStorage.removeItem('pantheon-v1-' + slot);
+  w.eval(`godScreen(); UI.god.name=${JSON.stringify(name)}; UI.god.sph=${sph}; UI.god.g='${g}'; UI.god.speed='min'; createGod(); birthHero();`);
+}
+window.runTest = async function () {
+  const A = W('a'), B = W('b'), out = [], a = s => A.eval(s), b = s => B.eval(s);
+  await setup(A, 'testA', 'Хронос', 0, 'm'); await setup(B, 'testB', 'Флора', 2, 'f');
+  A.NET.host('TESTA'); await sleep(300);
+  B.NET.join('TESTA'); await sleep(1200);
+  out.push(['A видит богов', Object.keys(A.NET.gods).length], ['B видит богов', Object.keys(B.NET.gods).length]);
+  b(`NET.send({ t: 'chat', from: godPub(), txt: 'Привет, Хронос!', ts: Date.now() })`); await sleep(300);
+  a(`NET.send({ t: 'chat', from: godPub(), txt: 'Привет, Флора.', ts: Date.now() })`); await sleep(300);
+  out.push(['чат A', a(`S.chat.filter(m => m.t === 'chat').map(m => m.txt).join(' / ')`)], ['чат B', b(`S.chat.filter(m => m.t === 'chat').map(m => m.txt).join(' / ')`)]);
+  const bid = b('S.heroes[0].id'), f0 = a('S.god.faith'), fe0 = b('S.heroes[0].feed.length');
+  a(`TGT={id:'${bid}'}; setTab('omens'); BR='help'; render(true); castOmen('help','luck')`); await sleep(600);
+  out.push(['вера A списана', f0 - a('S.god.faith')], ['лента B выросла', b('S.heroes[0].feed.length') - fe0], ['запись B', b('S.heroes[0].feed.slice(-2).map(f=>f.txt).join(" || ")')], ['ответ A', a('LASTRES')]);
+  B.NET.leave(); await sleep(500);
+  out.push(['A после выхода B', Object.keys(A.NET.gods).length, a('S.chat.slice(-1)[0].txt')]);
+  return out;
+};
+</script>

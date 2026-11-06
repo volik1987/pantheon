@@ -1,0 +1,17 @@
+{
+  "name": "Пантеон: Хроники богов",
+  "short_name": "Пантеон",
+  "description": "Ты — бог. Наблюдай за жизнью героя с рождения и влияй на неё знамениями.",
+  "lang": "ru",
+  "id": "./?app=pantheon",
+  "start_url": "./?app=pantheon",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f0c1d",
+  "theme_color": "#0f0c1d",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
